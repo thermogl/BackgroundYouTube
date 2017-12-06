@@ -14,11 +14,18 @@ class ViewController: UIViewController {
     private func parseIdentifier(from url: URL) -> String? {
         let urlString = url.absoluteString
         
-        guard let watchIndex = urlString.range(of: "?v=")?.upperBound else { return nil }
+        let startIndex: String.Index
+        if let watchIndex = urlString.range(of: "?v=")?.upperBound {
+            startIndex = watchIndex
+        } else if let beIndex = urlString.range(of: ".be/")?.upperBound {
+            startIndex = beIndex
+        } else {
+            return nil
+        }
         
-        let rangeAfter = Range<String.Index>(uncheckedBounds: (lower: watchIndex, upper: urlString.endIndex))
+        let rangeAfter = Range<String.Index>(uncheckedBounds: (lower: startIndex, upper: urlString.endIndex))
         if let andIndex = urlString.range(of: "&", options: [], range: rangeAfter, locale: nil)?.lowerBound {
-            return String(urlString[watchIndex..<andIndex])
+            return String(urlString[startIndex..<andIndex])
         } else {
             return String(urlString[rangeAfter])
         }
